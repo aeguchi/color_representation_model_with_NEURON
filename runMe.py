@@ -46,7 +46,7 @@ for data in input_files:
     tmp = im.load();
     inputImgs.append(tmp)
     
-resultFolderName = "results_new";
+resultFolderName = "results";
 controller.resultFolderName = resultFolderName;
 
 controller.variables.nTrainings =  nTrainings;
@@ -110,7 +110,7 @@ for itr in range(nTrainings):
                             inputStim[y][x].setRGB(r,g,b)
                     controller.setInput(inputStim,0.8)
                     controller.recordVols()
-                    if(itr==-1):
+                    if(itr==0):
                         controller.recordChannelVols()
                     controller.run()
                     
@@ -132,9 +132,9 @@ for itr in range(nTrainings):
                             nThreads=nThreads+1
                         controller.pc.nthread(nThreads)
                         
-                    if(itr%1000==-1):
+                    if(itr%1000==0):
                         controller.saveSpikeDetails(r,g,b,itr)
-                    if(itr==-1):
+                    if(itr==0):
                         controller.saveChannelSpikeDetails(r,g,b,itr)
                     
                     
