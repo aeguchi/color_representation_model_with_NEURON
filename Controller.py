@@ -53,9 +53,12 @@ class Controller(object):
         self.r_stims = [[0 for x in xrange(self.variables.dim_stim)] for x in xrange(self.variables.dim_stim)] 
         self.g_stims = [[0 for x in xrange(self.variables.dim_stim)] for x in xrange(self.variables.dim_stim)] 
         self.b_stims = [[0 for x in xrange(self.variables.dim_stim)] for x in xrange(self.variables.dim_stim)] 
+        self.steadyActivation = [[0 for x in xrange(self.variables.dim_stim)] for x in xrange(self.variables.dim_stim)] 
         self.variables.delay_r = [[0 for x in xrange(self.variables.dim_stim)] for x in xrange(self.variables.dim_stim)] 
         self.variables.delay_g = [[0 for x in xrange(self.variables.dim_stim)] for x in xrange(self.variables.dim_stim)] 
         self.variables.delay_b = [[0 for x in xrange(self.variables.dim_stim)] for x in xrange(self.variables.dim_stim)] 
+        self.variables.delay_steady = [[0 for x in xrange(self.variables.dim_stim)] for x in xrange(self.variables.dim_stim)] 
+        self.variables.steady_state_activation = 0.2
         for y in range(self.variables.dim_stim):
             for x in range(self.variables.dim_stim):
                 self.r_stims[y][x] = h.NetStim(0.5)
@@ -67,7 +70,8 @@ class Controller(object):
                 self.b_stims[y][x] = h.NetStim(0.5)
                 self.b_stims[y][x].noise = 0#0.1
                 self.variables.delay_b[y][x] = random();
-        self.variables.steady_state_activation = 0.2
+                self.steadyActivation[y][x] = h.NetStim(0.5);
+                self.variables.delay_steady[y][x] = random();
 
          
         #init layer to store cells
@@ -116,16 +120,32 @@ class Controller(object):
                 delay = delay_rgb2channel
                 weightConst = weight_rgb2channel
                 #L NetCon init (luminance - LGN-M)
-                self.NetCons.append(h.NetCon(self.r_stims[y_stim][x_stim],self.L_channels[index].AMPA,0,delay,weightConst*uniform(0.5,2)))#source, dest, threshold, delay, weight
-                self.NetCons.append(h.NetCon(self.g_stims[y_stim][x_stim],self.L_channels[index].AMPA,0,delay,weightConst*uniform(0.5,2)))#source, dest, threshold, delay, weight
+                weightTmp = weightConst*uniform(0.5,2);
+                self.NetCons.append(h.NetCon(self.r_stims[y_stim][x_stim],self.L_channels[index].AMPA,0,delay,weightTmp))#source, dest, threshold, delay, weight
+                self.NetCons.append(h.NetCon(self.steadyActivation[y_stim][x_stim],self.L_channels[index].AMPA,0,delay,weightTmp))
+                weightTmp = weightConst*uniform(0.5,2);
+                self.NetCons.append(h.NetCon(self.g_stims[y_stim][x_stim],self.L_channels[index].AMPA,0,delay,weightTmp))#source, dest, threshold, delay, weight
+                self.NetCons.append(h.NetCon(self.steadyActivation[y_stim][x_stim],self.L_channels[index].AMPA,0,delay,weightTmp))#source, dest, threshold, delay, weight
+                
+                
                 #C1 NetCon init (red-green - LGN-P)
-                self.NetCons.append(h.NetCon(self.r_stims[y_stim][x_stim],self.C1_channels[index].AMPA,0,delay,weightConst*uniform(0.5,2)))#source, dest, threshold, delay, weight
-                self.NetCons.append(h.NetCon(self.g_stims[y_stim][x_stim],self.C1_channels[index].GABA,0,delay,weightConst*uniform(0.5,2)))#source, dest, threshold, delay, weight
+                weightTmp = weightConst*uniform(0.5,2);
+                self.NetCons.append(h.NetCon(self.r_stims[y_stim][x_stim],self.C1_channels[index].AMPA,0,delay,weightTmp))#source, dest, threshold, delay, weight
+                self.NetCons.append(h.NetCon(self.steadyActivation[y_stim][x_stim],self.C1_channels[index].AMPA,0,delay,weightTmp))#source, dest, threshold, delay, weight
+                weightTmp = weightConst*uniform(0.5,2);
+                self.NetCons.append(h.NetCon(self.g_stims[y_stim][x_stim],self.C1_channels[index].GABA,0,delay,weightTmp))#source, dest, threshold, delay, weight
+                self.NetCons.append(h.NetCon(self.steadyActivation[y_stim][x_stim],self.C1_channels[index].GABA,0,delay,weightTmp))#source, dest, threshold, delay, weight
                 
                 #C2 NetCon init (blue-yellow - LGN k-path)
-                self.NetCons.append(h.NetCon(self.r_stims[y_stim][x_stim],self.C2_channels[index].AMPA,0,delay,1*weightConst*uniform(0.5,2)))#source, dest, threshold, delay, weight
-                self.NetCons.append(h.NetCon(self.g_stims[y_stim][x_stim],self.C2_channels[index].AMPA,0,delay,1*weightConst*uniform(0.5,2)))#source, dest, threshold, delay, weight
-                self.NetCons.append(h.NetCon(self.b_stims[y_stim][x_stim],self.C2_channels[index].GABA,0,delay,2*(weightConst*uniform(0.5,2))))#source, dest, threshold, delay, weight
+                weightTmp = weightConst*uniform(0.5,2);
+                self.NetCons.append(h.NetCon(self.r_stims[y_stim][x_stim],self.C2_channels[index].AMPA,0,delay,1*weightTmp))#source, dest, threshold, delay, weight
+                self.NetCons.append(h.NetCon(self.steadyActivation[y_stim][x_stim],self.C2_channels[index].AMPA,0,delay,1*weightTmp))#source, dest, threshold, delay, weight
+                weightTmp = weightConst*uniform(0.5,2);
+                self.NetCons.append(h.NetCon(self.g_stims[y_stim][x_stim],self.C2_channels[index].AMPA,0,delay,1*weightTmp))#source, dest, threshold, delay, weight
+                self.NetCons.append(h.NetCon(self.steadyActivation[y_stim][x_stim],self.C2_channels[index].AMPA,0,delay,1*weightTmp))#source, dest, threshold, delay, weight
+                weightTmp = weightConst*uniform(0.5,2);
+                self.NetCons.append(h.NetCon(self.b_stims[y_stim][x_stim],self.C2_channels[index].GABA,0,delay,2*weightTmp))#source, dest, threshold, delay, weight
+                self.NetCons.append(h.NetCon(self.steadyActivation[y_stim][x_stim],self.C2_channels[index].GABA,0,delay,2*weightTmp))#source, dest, threshold, delay, weight
                 
                 
                 #Constructing synaptic connections between L, C1 and CortexLayer_4
@@ -1317,23 +1337,28 @@ class Controller(object):
     def setInput(self,inputStim,duration=1):#inputStim[r][g][b]
         #spike input
         delay = 0#self.variables.tstop * (1-duration)/2
+        eps = 0.0001
         
         for y in range(self.variables.dim_stim):
             for x in range(self.variables.dim_stim):
-                self.r_stims[y][x].number = self.variables.hz*self.variables.tstop/1000*(self.variables.steady_state_activation+(1-self.variables.steady_state_activation)*inputStim[y][x].r)#*3#(average) number of spikes
+                self.r_stims[y][x].number = self.variables.hz*self.variables.tstop/1000*inputStim[y][x].r+eps#*3#(average) number of spikes
                 self.r_stims[y][x].interval = self.variables.tstop/self.r_stims[y][x].number# ms (mean) time between spikes
                 self.r_stims[y][x].number = self.r_stims[y][x].number*duration
                 self.r_stims[y][x].start = (delay+self.r_stims[y][x].interval*self.variables.delay_r[y][x])%(self.variables.tstop*duration)
                  
-                self.g_stims[y][x].number = self.variables.hz*self.variables.tstop/1000*(self.variables.steady_state_activation+(1-self.variables.steady_state_activation)*inputStim[y][x].g)#*3#(average) number of spikes
+                self.g_stims[y][x].number = self.variables.hz*self.variables.tstop/1000*inputStim[y][x].g+eps#*3#(average) number of spikes
                 self.g_stims[y][x].interval = self.variables.tstop/self.g_stims[y][x].number# ms (mean) time between spikes
                 self.g_stims[y][x].number = self.g_stims[y][x].number*duration
                 self.g_stims[y][x].start = (delay+self.g_stims[y][x].interval*self.variables.delay_g[y][x])%(self.variables.tstop*duration)
                  
-                self.b_stims[y][x].number = self.variables.hz*self.variables.tstop/1000*(self.variables.steady_state_activation+(1-self.variables.steady_state_activation)*inputStim[y][x].b)#*3#(average) number of spikes
+                self.b_stims[y][x].number = self.variables.hz*self.variables.tstop/1000*inputStim[y][x].b+eps#*3#(average) number of spikes
                 self.b_stims[y][x].interval = self.variables.tstop/self.b_stims[y][x].number# ms (mean) time between spikes
                 self.b_stims[y][x].number = self.b_stims[y][x].number*duration
                 self.b_stims[y][x].start = (delay+self.b_stims[y][x].interval*self.variables.delay_b[y][x])%(self.variables.tstop*duration)
+                
+                self.steadyActivation[y][x].number = self.variables.hz*self.variables.tstop/1000*self.variables.steady_state_activation
+                self.steadyActivation[y][x].interval = self.variables.tstop/self.steadyActivation[y][x].number# ms (mean) time between spikes
+                self.steadyActivation[y][x].start = (delay+self.steadyActivation[y][x].interval*self.variables.delay_steady[y][x])%(self.variables.tstop)
           
 #         self.r_stim.number = self.variables.hz*self.variables.tstop/1000*(self.variables.steady_state_activation+(1-self.variables.steady_state_activation)*r)#*3#(average) number of spikes
 #         self.r_stim.interval = self.variables.tstop/self.r_stim.number# ms (mean) time between spikes
