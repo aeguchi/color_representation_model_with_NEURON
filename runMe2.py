@@ -12,12 +12,12 @@ ndim = 30
 dim_stim = 10
 
 controller = Controller(dim_stim,ndim)
-resultFolderName = "results_new";
+resultFolderName = "results";
 controller.resultFolderName = resultFolderName;
 transOn = 1
 singleColor = 1
 alteringInput = 0#not fully implemented yet
-itr = 0
+itr = 2000
 
 class InputStim:
     r=0
@@ -50,6 +50,7 @@ for index in range(len(controller.NetCons_STDP_LtoL4)):
     weightTemp_LtoL4.append(controller.NetCons_STDP_LtoL4[index].weight[0])
     weightTemp_C1toL4.append(controller.NetCons_STDP_C1toL4[index].weight[0])
     weightTemp_C2toL23.append(controller.NetCons_STDP_C2toL23[index].weight[0])
+for index in range(len(controller.NetCons_STDP_L4toL23)):
     weightTemp_L4toL23.append(controller.NetCons_STDP_L4toL23[index].weight[0])
     weightTemp_L23toL5.append(controller.NetCons_STDP_L23toL5[index].weight[0])
 
@@ -99,7 +100,7 @@ if(singleColor==1):
                                 
                 controller.updateSpikeCount()
 #                 controller.outputFR(itr)
-                controller.saveSpikeDetails(r,g,b,itr)
+#                 controller.saveSpikeDetails(r,g,b,itr)
                 #controller.saveChannelSpikeDetails(r,g,b,itr)
                 
                 
