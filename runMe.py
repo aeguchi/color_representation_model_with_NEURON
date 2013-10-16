@@ -64,6 +64,7 @@ for itr in range(nTrainings):
         weightTemp_LtoL4.append(controller.NetCons_STDP_LtoL4[index].weight[0])
         weightTemp_C1toL4.append(controller.NetCons_STDP_C1toL4[index].weight[0])
         weightTemp_C2toL23.append(controller.NetCons_STDP_C2toL23[index].weight[0])
+    for index in range(len(controller.NetCons_STDP_L4toL23)):
         weightTemp_L4toL23.append(controller.NetCons_STDP_L4toL23[index].weight[0])
         weightTemp_L23toL5.append(controller.NetCons_STDP_L23toL5[index].weight[0])
     weights_LtoL4.append(weightTemp_LtoL4)
@@ -73,7 +74,7 @@ for itr in range(nTrainings):
     weights_L23toL5.append(weightTemp_L23toL5)
     
     #output the weight dynamics
-    if(itr%100==0):
+    if(itr%10==0):
         fig1 = plt.gcf()
         plt.clf()  
         plt.subplot(511)
@@ -110,7 +111,7 @@ for itr in range(nTrainings):
                             inputStim[y][x].setRGB(r,g,b)
                     controller.setInput(inputStim,0.8)
                     controller.recordVols()
-                    if(itr==0):
+                    if(itr==-1):
                         controller.recordChannelVols()
                     controller.run()
                     
@@ -132,9 +133,9 @@ for itr in range(nTrainings):
                             nThreads=nThreads+1
                         controller.pc.nthread(nThreads)
                         
-                    if(itr%1000==0):
+                    if(itr%2000==-1):
                         controller.saveSpikeDetails(r,g,b,itr)
-                    if(itr==0):
+                    if(itr==-1):
                         controller.saveChannelSpikeDetails(r,g,b,itr)
                     
                     
