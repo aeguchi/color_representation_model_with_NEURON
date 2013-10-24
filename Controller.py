@@ -13,13 +13,13 @@ class Controller(object):
     def __init__(self,dim_stim,dim):
         self.variables = StateClass()
         
-        self.variables.maxWeight = 0.005 #0.004 maximum weight synaptic connections can have
+        self.variables.maxWeight = 0.005 #maximum weight synaptic connections can have
         self.variables.minWeight = 0  #minimum weight synaptic connections can have
         self.variables.dim = dim  #number of cells on one side in a layer (ie the number of cells are dim*dim)
         self.variables.learningState = 1  #0: no synaptic modifications / 1: synaptic modifications with STDP
         self.variables.tstop = 300 #duration for each trial ([ms])
-        self.variables.maxWeightsMulti=1.5 #toL23
-        self.variables.maxWeightsMulti2=2.5 #toL5
+        self.variables.maxWeightsMulti=1.5#1.5 #toL23
+        self.variables.maxWeightsMulti2=2.5#2.5# #toL5
         self.resultFolderName = "results";
          
         #h.dt = 1  # time-step ([ms]) -- PROBLEM: this value cannot be changed?? (stays 0.025)
@@ -175,6 +175,7 @@ class Controller(object):
                 tmpNetCon.delay = delayConst
                 tmpNetCon.weight[0] = weightConst*uniform(initRandMinRange,initRandMaxRange)#*random()
                 self.NetCons_STDP_C2toL23.append(tmpNetCon)
+                
                 #CortexLayer_4 to cortexLayer_2_3
                 weightConst=weight_L4ToL23
                 delayConst = delay_L4ToL23
@@ -902,7 +903,7 @@ class Controller(object):
                 ## D.....D
                 ##  D...D
                 ##   DDD
-                weightTemp = weight_lateral_dep*2
+                weightTemp = weight_lateral_dep*1.7#2
                 delayConst = delay_lateral_dep
                     
                 #L4
@@ -1028,7 +1029,7 @@ class Controller(object):
                 
                 
                 #L2_3
-                weightTemp = weight_lateral_dep*1.7
+                weightTemp = weight_lateral_dep*1.5#1.7
                 
                 index_tmp = y*dim+(x+3)%dim
                 nc_tmp = h.NetCon(self.cortexLayer_2_3[index].soma(0.5)._ref_v, self.cortexLayer_2_3[index_tmp].GABA, sec=self.cortexLayer_2_3[index].soma)
@@ -1459,46 +1460,86 @@ class Controller(object):
         #adjust the weight values to make the average is around 50%
         for index in range(len(self.NetCons_STDP_LtoL4)):
             tmp = self.NetCons_STDP_LtoL4[index].weight[0]+LtoL4_mod
-            if(tmp>self.variables.maxWeight):
+            if(tmp>=self.variables.maxWeight):
                 self.NetCons_STDP_LtoL4[index].weight[0] = self.variables.maxWeight
-            elif(tmp<self.variables.minWeight):
+#                 LtoL4_mod+=(tmp-self.variables.maxWeight)/(len(self.NetCons_STDP_LtoL4)-index)
+            elif(tmp<=self.variables.minWeight):
                 self.NetCons_STDP_LtoL4[index].weight[0] = self.variables.minWeight
+#                 LtoL4_mod-=(self.variables.minWeight-tmp)/(len(self.NetCons_STDP_LtoL4)-index)
             else:
                 self.NetCons_STDP_LtoL4[index].weight[0] = tmp
             
             tmp = self.NetCons_STDP_C1toL4[index].weight[0]+C1toL4_mod
-            if(tmp>self.variables.maxWeight):
+            if(tmp>=self.variables.maxWeight):
                 self.NetCons_STDP_C1toL4[index].weight[0] = self.variables.maxWeight
-            elif(tmp<self.variables.minWeight):
+#                 C1toL4_mod+=(tmp-self.variables.maxWeight)/(len(self.NetCons_STDP_C1toL4)-index)
+            elif(tmp<=self.variables.minWeight):
                 self.NetCons_STDP_C1toL4[index].weight[0] = self.variables.minWeight
+#                 C1toL4_mod-=(self.variables.minWeight-tmp)/(len(self.NetCons_STDP_C1toL4)-index)
             else:
                 self.NetCons_STDP_C1toL4[index].weight[0] = tmp  
             
             tmp = self.NetCons_STDP_C2toL23[index].weight[0]+C2toL23_mod
-            if(tmp>self.variables.maxWeight*self.variables.maxWeightsMulti):
+            if(tmp>=self.variables.maxWeight*self.variables.maxWeightsMulti):
                 self.NetCons_STDP_C2toL23[index].weight[0] = self.variables.maxWeight*self.variables.maxWeightsMulti
-            elif(tmp<self.variables.minWeight):
+#                 C2toL23_mod+=(tmp-self.variables.maxWeight*self.variables.maxWeightsMulti)/(len(self.NetCons_STDP_C2toL23)-index)
+            elif(tmp<=self.variables.minWeight):
                 self.NetCons_STDP_C2toL23[index].weight[0] = self.variables.minWeight
+#                 C2toL23_mod-=(self.variables.minWeight-tmp)/(len(self.NetCons_STDP_C2toL23)-index)
             else:
                 self.NetCons_STDP_C2toL23[index].weight[0] = tmp
                     
         for index in range(len(self.NetCons_STDP_L4toL23)):   
             tmp = self.NetCons_STDP_L4toL23[index].weight[0]+L4toL23_mod
-            if(tmp>self.variables.maxWeight*self.variables.maxWeightsMulti):
+            if(tmp>=self.variables.maxWeight*self.variables.maxWeightsMulti):
                 self.NetCons_STDP_L4toL23[index].weight[0] = self.variables.maxWeight*self.variables.maxWeightsMulti
-            elif(tmp<self.variables.minWeight):
+#                 L4toL23_mod+=(tmp-self.variables.maxWeight*self.variables.maxWeightsMulti)/(len(self.NetCons_STDP_L4toL23)-index)
+            elif(tmp<=self.variables.minWeight):
                 self.NetCons_STDP_L4toL23[index].weight[0] = self.variables.minWeight
+#                 L4toL23_mod-=(self.variables.minWeight-tmp)/(len(self.NetCons_STDP_L4toL23)-index)
             else:
                 self.NetCons_STDP_L4toL23[index].weight[0] = tmp   
                 
             tmp = self.NetCons_STDP_L23toL5[index].weight[0]+L23toL5_mod
-            if(tmp>self.variables.maxWeight*self.variables.maxWeightsMulti2):
+            if(tmp>=self.variables.maxWeight*self.variables.maxWeightsMulti2):
                 self.NetCons_STDP_L23toL5[index].weight[0] = self.variables.maxWeight*self.variables.maxWeightsMulti2
-            elif(tmp<self.variables.minWeight):
+#                 L23toL5_mod+=(tmp-self.variables.maxWeight*self.variables.maxWeightsMulti2)/(len(self.NetCons_STDP_L23toL5)-index)
+            elif(tmp<=self.variables.minWeight):
                 self.NetCons_STDP_L23toL5[index].weight[0] = self.variables.minWeight
+#                 L23toL5_mod-=(self.variables.minWeight-tmp)/(len(self.NetCons_STDP_L23toL5)-index)
             else:
-                self.NetCons_STDP_L23toL5[index].weight[0] = tmp   
-    
+                self.NetCons_STDP_L23toL5[index].weight[0] = tmp            
+            
+        
+            
+#                 
+#     def weightNormalization2(self):
+#             #find Max
+#             LtoL4_div = 0
+#             C1toL4_div = 0
+#             C2toL23_div = 0
+#             L4toL23_div = 0
+#             L23toL5_div = 0
+#             
+#             #calculate average weight
+#             for index in range(len(self.NetCons_STDP_LtoL4)):#self.variables.dim*self.variables.dim):
+#                 LtoL4_div+=pow(self.NetCons_STDP_LtoL4[index].weight[0],2)
+#                 C1toL4_div+=pow(self.NetCons_STDP_C1toL4[index].weight[0],2)
+#                 C2toL23_div+=pow(self.NetCons_STDP_C2toL23[index].weight[0],2)
+#             for index in range(len(self.NetCons_STDP_L4toL23)):#self.variables.dim*self.variables.dim):
+#                 L4toL23_div+=pow(self.NetCons_STDP_L4toL23[index].weight[0],2)
+#                 L23toL5_div+=pow(self.NetCons_STDP_L23toL5[index].weight[0],2)
+#             
+#             #adjust the weight values to make the average is around 50%
+#             for index in range(len(self.NetCons_STDP_LtoL4)):
+#                 self.NetCons_STDP_LtoL4[index].weight[0]= self.NetCons_STDP_LtoL4[index].weight[0]/math.sqrt(LtoL4_div)*self.variables.maxWeight
+#                 self.NetCons_STDP_C1toL4[index].weight[0] = self.NetCons_STDP_C1toL4[index].weight[0]/math.sqrt(C1toL4_div)*self.variables.maxWeight
+#                 self.NetCons_STDP_C2toL23[index].weight[0] = self.NetCons_STDP_C2toL23[index].weight[0]/math.sqrt(C2toL23_div)*self.variables.maxWeight*self.variables.maxWeightsMulti
+#                         
+#             for index in range(len(self.NetCons_STDP_L4toL23)):   
+#                 self.NetCons_STDP_L4toL23[index].weight[0] = self.NetCons_STDP_L4toL23[index].weight[0]/math.sqrt(L4toL23_div)*self.variables.maxWeight*self.variables.maxWeightsMulti
+#                 self.NetCons_STDP_L23toL5[index].weight[0] = self.NetCons_STDP_L23toL5[index].weight[0]/math.sqrt(L23toL5_div)*self.variables.maxWeight*self.variables.maxWeightsMulti2
+#                 
     
     def saveSpikeDetails(self,r,g,b,itr):
         #output voltage dynamics of each cells in the cortex layer
@@ -1656,6 +1697,41 @@ class Controller(object):
         f.close()    
         
     
+    def updateAllSpikeCount(self):#including channels
+        self.updateSpikeCount()
+        dim = self.variables.dim
+        self.spikeCount_L = [[0 for x in xrange(dim)] for x in xrange(dim)] 
+        for y in range(dim):
+            for x in range(dim):
+                index = y*dim+x 
+                for _i in range(int(self.variables.tstop / h.dt) + 1):
+                    if self.vvolt_channel_L[index][_i]>0:
+                        if (_i>0 and self.vvolt_channel_L[index][_i-1]>0):
+                            continue
+                        self.spikeCount_L[y][x] += 1#self.vvolt_cortexL_4[index][_i]
+                        
+        self.spikeCount_C1 = [[0 for x in xrange(dim)] for x in xrange(dim)] 
+        for y in range(dim):
+            for x in range(dim):
+                index = y*dim+x 
+                for _i in range(int(self.variables.tstop / h.dt) + 1):
+                    if self.vvolt_channel_C1[index][_i]>0:
+                        if (_i>0 and self.vvolt_channel_C1[index][_i-1]>0):
+                            continue
+                        self.spikeCount_C1[y][x] += 1#self.vvolt_cortexL_4[index][_i]
+                        
+        self.spikeCount_C2 = [[0 for x in xrange(dim)] for x in xrange(dim)] 
+        for y in range(dim):
+            for x in range(dim):
+                index = y*dim+x 
+                for _i in range(int(self.variables.tstop / h.dt) + 1):
+                    if self.vvolt_channel_C2[index][_i]>0:
+                        if (_i>0 and self.vvolt_channel_C2[index][_i-1]>0):
+                            continue
+                        self.spikeCount_C2[y][x] += 1#self.vvolt_cortexL_4[index][_i]
+   
+        
+    
     #function to count number of spikes 
     def updateSpikeCount(self):
         dim = self.variables.dim
@@ -1688,6 +1764,17 @@ class Controller(object):
                         if (_i>0 and self.vvolt_cortexL_5[index][_i-1]>0):
                             continue
                         self.spikeCount_L5[y][x] += 1#self.vvolt_cortexL_4[index][_i]
+                        
+                        
+    def hebbUpdate(self):#todo sometime in the future
+        self.updateAllSpikeCount()
+        #C1
+        #update the weights based on the firing count at the end of each iteration
+        
+        
+        
+        
+        
             
     #to change synaptic modifications are active or not
     def setLearningStates(self,state):#state=0: no learning, state=1:learning is active

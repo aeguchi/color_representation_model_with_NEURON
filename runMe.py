@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pylab
 import Image, glob
 from time import time
+import math
 
 
 
@@ -12,6 +13,7 @@ ndim = 30
 dim_stim = 10
 inputFromImages = 0
 controller = Controller(dim_stim,ndim)
+Hebb = 0
 
 weights_LtoL4 = []
 weights_C1toL4 = []
@@ -51,6 +53,8 @@ controller.resultFolderName = resultFolderName;
 
 controller.variables.nTrainings =  nTrainings;
 controller.initExtra()
+if(Hebb):
+    controller.setLearningStates(0)
 
 for itr in range(nTrainings):
     #testing
@@ -74,7 +78,7 @@ for itr in range(nTrainings):
     weights_L23toL5.append(weightTemp_L23toL5)
     
     #output the weight dynamics
-    if(itr%10==0):
+    if(itr%100==0):
         fig1 = plt.gcf()
         plt.clf()  
         plt.subplot(511)
@@ -155,7 +159,8 @@ for itr in range(nTrainings):
                     
                         
         fig1.savefig(resultFolderName+"/"+str(itr),format="eps")#dpi=100, 
-        controller.setLearningStates(1)#start synaptic modifications
+        if(~Hebb):
+            controller.setLearningStates(1)#start synaptic modifications
 
     if(itr==nTrainings-1):
         break
@@ -202,8 +207,17 @@ for itr in range(nTrainings):
     
     controller.setInput(inputStim)
     controller.recordVols()
+    if(Hebb):
+        controller.recordChannelVols()
     controller.run()
+    
+    if(Hebb):
+        controller.hebbUpdate()
+    
+    
+    
     controller.weightNormalization()
+#     controller.weightNormalization2()
     #controller.drawGraph()
     timeSpent = time()-startTime
     print "iteration time:"+str(timeSpent)+" with nThreads:"+str(nThreads)

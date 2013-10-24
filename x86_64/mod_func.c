@@ -6,8 +6,8 @@ modl_reg(){
   if (!nrn_nobanner_) if (nrnmpi_myid < 1) {
     fprintf(stderr, "Additional mechanisms from files\n");
 
-    fprintf(stderr," stdp.mod");
+    fprintf(stderr," stdp3.mod");
     fprintf(stderr, "\n");
   }
-  _stdp_reg();
+  _stdp3_reg();
 }
