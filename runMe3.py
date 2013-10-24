@@ -15,7 +15,7 @@ ndim = 30
 dim_stim = 10
 
 controller = Controller(dim_stim,ndim)
-resultFolderName = "results_new";
+resultFolderName = "results";
 controller.resultFolderName = resultFolderName;
 transOn = 1
 singleColor = 1
@@ -291,10 +291,10 @@ ming = np.min(decodedColors[:,1])
 maxb = np.max(decodedColors[:,2])
 minb = np.min(decodedColors[:,2])
 
-max_ = max(maxr,max(maxg,maxb));
-maxr = max_
-maxg = max_
-maxb = max_
+# max_ = max(maxr,max(maxg,maxb));
+# maxr = max_
+# maxg = max_
+# maxb = max_
 
 # print minr, ming, minb
 print "maxr = " + str(maxr)

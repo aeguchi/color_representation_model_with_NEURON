@@ -30,7 +30,7 @@ class CellClass(object):
         #STDP constant
         d=1
         p=1
-        self.LR = 0.00001#0.00001
+        self.LR = 0.000005#0.00001
         self.syn_STDP = h.ExpSynSTDP(0.8,sec=self.soma)
         self.syn_STDP.tau = 5
         self.syn_STDP.d = d#LTD
